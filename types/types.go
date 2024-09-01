@@ -11,13 +11,38 @@ type UserStore interface {
 type ProductStore interface {
 	GetProducts() ([]Product, error)
 	GetProductByID(id int) (*Product, error)
+	GetProductsByIDs(ids []int) ([]Product, error)
 	CreateProduct(Product) error
+	UpdateProduct(Product) error
+}
+
+type OrderStore interface {
+	CreateOrder(Order) (int, error)
+	CreateOrderItem(OrderItem) error
 }
 
 type mockUserStore struct{}
 
 func GetUserByEmail(email string) (*User, error) {
 	return nil, nil
+}
+
+type Order struct {
+	ID        int       `json:"id"`
+	UserID    int       `json:"userID"`
+	Total     float64   `json:"total"`
+	Status    string    `json:"status"`
+	Address   string    `json:"address"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type OrderItem struct {
+	ID        int       `json:"id"`
+	OrderID   int       `json:"orderID"`
+	ProductID int       `json:"productID"`
+	Quantity  int       `json:"quantity"`
+	Price     float64   `json:"price"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type Product struct {
@@ -57,4 +82,13 @@ type CreateProductPayload struct {
 	Image       string  `json:"image" validate:"required"`
 	Price       float64 `json:"price" validate:"required,min=0.01"`
 	Quantity    int     `json:"quantity" validate:"required,min=1"`
+}
+
+type CartItem struct {
+	ProductID int
+	Quantity  int
+}
+
+type CartCheckoutPayload struct {
+	Items []CartItem `json:"items" validate:"required"`
 }

@@ -2,6 +2,8 @@ package api
 
 import (
 	"database/sql"
+	"github.com/sikozonpc/ecom/service/cart"
+	"github.com/sikozonpc/ecom/service/order"
 	"github.com/sikozonpc/ecom/service/product"
 	"log"
 	"net/http"
@@ -33,6 +35,11 @@ func (s *APIServer) Run() error {
 	productStore := product.NewStore(s.db)
 	productHandler := product.NewHandler(productStore)
 	productHandler.RegisterRoutes(subRouter)
+
+	orderStore := order.NewStore(s.db)
+
+	cartHandler := cart.NewHandler(orderStore, productStore, userStore)
+	cartHandler.RegisterRoutes(subRouter)
 
 	log.Println("Listening on", s.addr)
 
